@@ -19,7 +19,7 @@ on post-fs
     mkdir /config/usb_gadget/g1/functions/ffs.mtp
     write /config/usb_gadget/g1/functions/ffs.mtp/os_desc/interface.MTP/compatible_id "MTP"
     mkdir /config/usb_gadget/g1/functions/ffs.ptp
-    mkdir /config/usb_gadget/g1/functions/mtk_rndis.gs4
+    mkdir /config/usb_gadget/g1/functions/${vendor.usb.rndis.config:-mtk_rndis.gs4}
     mkdir /config/usb_gadget/g1/functions/midi.gs5
     mkdir /config/usb_gadget/g1/functions/acm.gs0
     mkdir /config/usb_gadget/g1/functions/acm.gs1
@@ -29,7 +29,7 @@ on post-fs
     mkdir /config/usb_gadget/g1/functions/hid.gs0
     mkdir /config/usb_gadget/g1/functions/ncm.gs9
     mkdir /config/usb_gadget/g1/functions/uvc.0
-    write /config/usb_gadget/g1/functions/ncm.gs6/ifname ncm%d
+    write /config/usb_gadget/g1/functions/ncm.gs9/ifname ncm%d
     mkdir /config/usb_gadget/g1/configs/b.1 0770 shell shell
     mkdir /config/usb_gadget/g1/configs/b.1/strings/0x409 0770 shell shell
     write /config/usb_gadget/g1/os_desc/b_vendor_code 0x1
@@ -43,14 +43,14 @@ on post-fs
     mount functionfs ptp /dev/usb-ffs/ptp rmode=0770,fmode=0660,uid=1024,gid=1024,no_disconnect=1
     setprop sys.usb.mtp.device_type 3
 
-    # Modify class/subclass/protocol for mtk_rndis.gs4
+    # Configure the selected RNDIS function.
     # Remote NDIS: Class: Wireless Controller (0xe0), Subclass: 0x1, Protocol: 0x3
-    write /config/usb_gadget/g1/functions/mtk_rndis.gs4/class e0
-    write /config/usb_gadget/g1/functions/mtk_rndis.gs4/subclass 01
-    write /config/usb_gadget/g1/functions/mtk_rndis.gs4/protocol 03
-    write /config/usb_gadget/g1/functions/mtk_rndis.gs4/os_desc/interface.ncm/compatible_id RNDIS
-    write /config/usb_gadget/g1/functions/mtk_rndis.gs4/ifname rndis%d
-    setprop vendor.usb.rndis.config mtk_rndis.gs4
+    write /config/usb_gadget/g1/functions/${vendor.usb.rndis.config:-mtk_rndis.gs4}/class e0
+    write /config/usb_gadget/g1/functions/${vendor.usb.rndis.config:-mtk_rndis.gs4}/subclass 01
+    write /config/usb_gadget/g1/functions/${vendor.usb.rndis.config:-mtk_rndis.gs4}/protocol 03
+    write /config/usb_gadget/g1/functions/${vendor.usb.rndis.config:-mtk_rndis.gs4}/os_desc/interface.ncm/compatible_id RNDIS
+    write /config/usb_gadget/g1/functions/${vendor.usb.rndis.config:-mtk_rndis.gs4}/ifname rndis%d
+    setprop vendor.usb.rndis.config ${vendor.usb.rndis.config:-mtk_rndis.gs4}
 
     # ncm function
     mkdir /config/usb_gadget/g1/functions/ncm.gs9
@@ -200,32 +200,32 @@ on post-fs
     chown system system /config/usb_gadget/g1/functions/mtp.gs0/os_desc/interface.MTP
     chown system system /config/usb_gadget/g1/functions/mtp.gs0/os_desc/interface.MTP/compatible_id
     chown system system /config/usb_gadget/g1/functions/mtp.gs0/os_desc/interface.MTP/sub_compatible_id
-    chown system system /config/usb_gadget/g1/functions/ncm.gs6
-    chown system system /config/usb_gadget/g1/functions/ncm.gs6/dev_addr
-    chown system system /config/usb_gadget/g1/functions/ncm.gs6/host_addr
-    chown system system /config/usb_gadget/g1/functions/ncm.gs6/ifname
-    chown system system /config/usb_gadget/g1/functions/ncm.gs6/os_desc
-    chown system system /config/usb_gadget/g1/functions/ncm.gs6/os_desc/interface.ncm
-    chown system system /config/usb_gadget/g1/functions/ncm.gs6/os_desc/interface.ncm/compatible_id
-    chown system system /config/usb_gadget/g1/functions/ncm.gs6/os_desc/interface.ncm/sub_compatible_id
-    chown system system /config/usb_gadget/g1/functions/ncm.gs6/qmult
+    chown system system /config/usb_gadget/g1/functions/ncm.gs9
+    chown system system /config/usb_gadget/g1/functions/ncm.gs9/dev_addr
+    chown system system /config/usb_gadget/g1/functions/ncm.gs9/host_addr
+    chown system system /config/usb_gadget/g1/functions/ncm.gs9/ifname
+    chown system system /config/usb_gadget/g1/functions/ncm.gs9/os_desc
+    chown system system /config/usb_gadget/g1/functions/ncm.gs9/os_desc/interface.ncm
+    chown system system /config/usb_gadget/g1/functions/ncm.gs9/os_desc/interface.ncm/compatible_id
+    chown system system /config/usb_gadget/g1/functions/ncm.gs9/os_desc/interface.ncm/sub_compatible_id
+    chown system system /config/usb_gadget/g1/functions/ncm.gs9/qmult
     chown system system /config/usb_gadget/g1/functions/ptp.gs1
     chown system system /config/usb_gadget/g1/functions/ptp.gs1/os_desc
     chown system system /config/usb_gadget/g1/functions/ptp.gs1/os_desc/interface.MTP
     chown system system /config/usb_gadget/g1/functions/ptp.gs1/os_desc/interface.MTP/compatible_id
     chown system system /config/usb_gadget/g1/functions/ptp.gs1/os_desc/interface.MTP/sub_compatible_id
-    chown system system /config/usb_gadget/g1/functions/mtk_rndis.gs4
-    chown system system /config/usb_gadget/g1/functions/mtk_rndis.gs4/class
-    chown system system /config/usb_gadget/g1/functions/mtk_rndis.gs4/dev_addr
-    chown system system /config/usb_gadget/g1/functions/mtk_rndis.gs4/host_addr
-    chown system system /config/usb_gadget/g1/functions/mtk_rndis.gs4/ifname
-    chown system system /config/usb_gadget/g1/functions/mtk_rndis.gs4/os_desc
-    chown system system /config/usb_gadget/g1/functions/mtk_rndis.gs4/os_desc/interface.rndis
-    chown system system /config/usb_gadget/g1/functions/mtk_rndis.gs4/os_desc/interface.rndis/compatible_id
-    chown system system /config/usb_gadget/g1/functions/mtk_rndis.gs4/os_desc/interface.rndis/sub_compatible_id
-    chown system system /config/usb_gadget/g1/functions/mtk_rndis.gs4/protocol
-    chown system system /config/usb_gadget/g1/functions/mtk_rndis.gs4/qmult
-    chown system system /config/usb_gadget/g1/functions/mtk_rndis.gs4/subclass
+    chown system system /config/usb_gadget/g1/functions/${vendor.usb.rndis.config:-mtk_rndis.gs4}
+    chown system system /config/usb_gadget/g1/functions/${vendor.usb.rndis.config:-mtk_rndis.gs4}/class
+    chown system system /config/usb_gadget/g1/functions/${vendor.usb.rndis.config:-mtk_rndis.gs4}/dev_addr
+    chown system system /config/usb_gadget/g1/functions/${vendor.usb.rndis.config:-mtk_rndis.gs4}/host_addr
+    chown system system /config/usb_gadget/g1/functions/${vendor.usb.rndis.config:-mtk_rndis.gs4}/ifname
+    chown system system /config/usb_gadget/g1/functions/${vendor.usb.rndis.config:-mtk_rndis.gs4}/os_desc
+    chown system system /config/usb_gadget/g1/functions/${vendor.usb.rndis.config:-mtk_rndis.gs4}/os_desc/interface.rndis
+    chown system system /config/usb_gadget/g1/functions/${vendor.usb.rndis.config:-mtk_rndis.gs4}/os_desc/interface.rndis/compatible_id
+    chown system system /config/usb_gadget/g1/functions/${vendor.usb.rndis.config:-mtk_rndis.gs4}/os_desc/interface.rndis/sub_compatible_id
+    chown system system /config/usb_gadget/g1/functions/${vendor.usb.rndis.config:-mtk_rndis.gs4}/protocol
+    chown system system /config/usb_gadget/g1/functions/${vendor.usb.rndis.config:-mtk_rndis.gs4}/qmult
+    chown system system /config/usb_gadget/g1/functions/${vendor.usb.rndis.config:-mtk_rndis.gs4}/subclass
     chown system system /config/usb_gadget/g1/functions/uvc.0
     chown system system /config/usb_gadget/g1/functions/uvc.0/control
     chown system system /config/usb_gadget/g1/functions/uvc.0/control/bInterfaceNumber
@@ -425,7 +425,7 @@ on charger
     setprop sys.usb.configfs 1
 
 on property:ro.bootmode=charger
-    setprop sys.usb.config midi
+    setprop sys.usb.config ${vendor.usb.charger.config:-midi}
 
 on property:sys.usb.config=midi && property:sys.usb.configfs=1
     write /config/usb_gadget/g1/idVendor ${vendor.usb.vid:-0x0E8D}
