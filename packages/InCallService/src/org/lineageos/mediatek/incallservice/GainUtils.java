@@ -8,6 +8,7 @@ package org.lineageos.mediatek.incallservice;
 
 import android.media.AudioSystem;
 import android.media.AudioDeviceInfo;
+import android.media.AudioManager;
 import android.os.SystemProperties;
 import android.util.Log;
 
@@ -29,11 +30,17 @@ public class GainUtils {
     }
 
     /**
-     * Sets the gain level for built-in earpiece and bluetooth SCO devices.
-     * @param gainIndex The gain level to set.
+     * Applies the current call volume to the selected communication device.
      */
-    public static void setGainLevel(int gainIndex) {
-        GainUtils.setGainLevel(AudioDeviceInfo.TYPE_BUILTIN_EARPIECE, gainIndex, AudioSystem.STREAM_VOICE_CALL);
-        GainUtils.setGainLevel(AudioDeviceInfo.TYPE_BLUETOOTH_SCO, gainIndex, AudioSystem.STREAM_VOICE_CALL);
+    public static void setGainLevel(AudioManager audioManager) {
+        AudioDeviceInfo callDevice = audioManager.getCommunicationDevice();
+        if (callDevice == null) {
+            return;
+        }
+
+        // The HAL expects the internal output-device mask, not AudioDeviceInfo.TYPE_*.
+        setGainLevel(callDevice.getPort().type(),
+                audioManager.getStreamVolume(AudioManager.STREAM_VOICE_CALL),
+                AudioSystem.STREAM_VOICE_CALL);
     }
 }
