@@ -143,8 +143,11 @@ static Status validateAndSetVidPid(int64_t functions) {
             pid = "0x200C";
             break;
         case GadgetFunction::ADB:
-            vid = "0x0E8D";
-            pid = "0x201C";
+            // Use Android's canonical ADB-only identity. Google's Windows
+            // android_winusb.inf binds to this VID/PID, while MediaTek's
+            // 0E8D:201C identity is not covered by that driver.
+            vid = "0x18d1";
+            pid = "0x4ee7";
             break;
         case GadgetFunction::MIDI:
             vid = "0x0E8D";
