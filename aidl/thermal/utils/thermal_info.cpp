@@ -1298,6 +1298,16 @@ bool ParseSensorInfo(const Json::Value &config,
         LOG(INFO) << "Sensor[" << name << "]'s SendCallback: " << std::boolalpha << send_cb
                   << std::noboolalpha;
 
+        bool polling_only = false;
+        if (!sensors[i]["PollingOnly"].empty()) {
+            if (!sensors[i]["PollingOnly"].isBool()) {
+                LOG(ERROR) << "Invalid Sensor[" << name << "]'s PollingOnly value";
+                sensors_parsed->clear();
+                return false;
+            }
+            polling_only = sensors[i]["PollingOnly"].asBool();
+        }
+
         bool send_powerhint = false;
         if (sensors[i]["SendPowerHint"].empty() || !sensors[i]["SendPowerHint"].isBool()) {
             LOG(INFO) << "Failed to read Sensor[" << name << "]'s SendPowerHint, set to 'false'";
@@ -1635,6 +1645,7 @@ bool ParseSensorInfo(const Json::Value &config,
                 .send_cb = send_cb,
                 .send_powerhint = send_powerhint,
                 .is_watch = is_watch,
+                .polling_only = polling_only,
                 .is_hidden = is_hidden,
                 .is_trip_point_ignorable = is_trip_point_ignorable,
                 .log_level = log_level,

@@ -240,6 +240,7 @@ struct SensorInfo {
     bool send_cb;
     bool send_powerhint;
     bool is_watch;
+    bool polling_only = false;  // Poll without updating kernel-owned trip points.
     bool is_hidden;
     bool is_trip_point_ignorable;
     ThrottlingSeverity log_level;

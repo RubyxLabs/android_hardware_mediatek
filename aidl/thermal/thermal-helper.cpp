@@ -1041,6 +1041,13 @@ void ThermalHelperImpl::initializeTrip(const std::unordered_map<std::string, std
             continue;
         }
 
+        // Some devices leave their trip points under kernel/vendor control.
+        // Their HAL sensors still need regular reads and severity callbacks.
+        if (sensor_info.second.polling_only) {
+            LOG(INFO) << "Sensor " << sensor_info.first << " uses polling without trip updates";
+            continue;
+        }
+
         bool trip_update = false;
         std::string_view sensor_name = sensor_info.first;
         std::string_view tz_path = path_map.at(sensor_name.data());
