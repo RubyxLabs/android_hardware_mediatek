@@ -911,19 +911,24 @@ bool ThermalThrottling::getCdevMaxRequest(std::string_view cdev_name, int *max_s
 
 void ThermalThrottling::logCoolingDeviceStatus(
         const std::unordered_map<std::string, CdevInfo> &cooling_device_info_map) {
-    int max_state = 0;
+    std::shared_lock<std::shared_mutex> _lock(cdev_all_request_map_mutex_);
+    if (cdev_all_request_map_.empty()) {
+        return;
+    }
     std::ostringstream cdev_log;
-    for (const auto &[cdev_name, cdev_info] : cooling_device_info_map) {
-        if (getCdevMaxRequest(cdev_name, &max_state)) {
-            ATRACE_INT((cdev_name + std::string("-state")).c_str(), max_state);
-            if (!cdev_info.apply_powercap) {
-                cdev_log << cdev_name << " state:" << max_state << " ";
-            } else {
-                const auto budget = static_cast<int>(
-                        std::lround(cdev_info.state2power[max_state] / cdev_info.multiplier));
-                cdev_log << cdev_name << " state:" << max_state << ",budget:" << budget << " ";
-                ATRACE_INT((cdev_name + std::string("-budget")).c_str(), budget);
-            }
+    // Report only devices controlled by this HAL. Other cooling devices may be
+    // exposed for reporting while the kernel or another thermal service owns them.
+    for (const auto &[cdev_name, requests] : cdev_all_request_map_) {
+        const auto &cdev_info = cooling_device_info_map.at(cdev_name);
+        const int max_state = *requests.begin();
+        ATRACE_INT((cdev_name + std::string("-state")).c_str(), max_state);
+        if (!cdev_info.apply_powercap) {
+            cdev_log << cdev_name << " state:" << max_state << " ";
+        } else {
+            const auto budget = static_cast<int>(
+                    std::lround(cdev_info.state2power[max_state] / cdev_info.multiplier));
+            cdev_log << cdev_name << " state:" << max_state << ",budget:" << budget << " ";
+            ATRACE_INT((cdev_name + std::string("-budget")).c_str(), budget);
         }
     }
     LOG(INFO) << "CDEV log " << cdev_log.str();
